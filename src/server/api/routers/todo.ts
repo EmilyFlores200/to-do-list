@@ -7,15 +7,99 @@ import {
 } from "~/server/api/trpc";
 
 export const todoRouter = createTRPCRouter({
-  postToDo: protectedProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
+  addTodo: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().optional(),
+        text: z.string().min(1),
+        isCompleted: z.boolean().default(false),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      const { title, text, isCompleted } = input;
+      const { prisma, session } = ctx;
+      const userId = session.user.id;
+      return ctx.prisma.toDo.create({
+        data: {
+          title,
+          text,
+          isCompleted,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
     }),
-
-  getAllToDos: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.example.findMany();
+  getAllToDos: protectedProcedure.query(({ ctx }) => {
+    return ctx.prisma.toDo.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+    });
   }),
+  getById: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.prisma.toDo.findMany({
+      where: {
+        id: input,
+      },
+    });
+  }),
+  deleteToDoById: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.toDo.delete({
+        where: {
+          id: input,
+        },
+      });
+    }),
+  deleteToDoCompleted: protectedProcedure.mutation(async ({ ctx }) => {
+    await ctx.prisma.toDo.deleteMany({
+      where: {
+        isCompleted: {
+          equals: true,
+        },
+      },
+    });
+  }),
+  toggleToDo: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        isCompleted: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, isCompleted } = input;
+      await ctx.prisma.toDo.update({
+        where: {
+          id,
+        },
+        data: {
+          isCompleted,
+        },
+      });
+    }),
+  toggleAll: protectedProcedure
+    .input(
+      z.object({
+        isCompleted: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { isCompleted } = input;
+      const { session } = ctx;
+      const userId = session.user.id;
+      await ctx.prisma.toDo.updateMany({
+        where: {
+          userId,
+          isCompleted: false,
+        },
+        data: {
+          isCompleted,
+        },
+      });
+    }),
 });
