@@ -1,12 +1,10 @@
-import { useState } from "react";
-
+import { FormEvent, useState } from "react";
 import { RiAddCircleLine } from "react-icons/ri";
 import { BsCheckAll } from "react-icons/bs";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 
 export default function ToDoInput() {
-  const [todo, setTodo] = useState({});
   const [text, setText] = useState("");
 
   const todoContext = api.useContext().toDo;
@@ -32,7 +30,7 @@ export default function ToDoInput() {
     deleteTodoCompleted();
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     createTodo({ text });
