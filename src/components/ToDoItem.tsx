@@ -12,9 +12,10 @@ function ToDoItem({ todoItem }: { todoItem: ToDo }) {
 
   const todoContext = api.useContext().toDo;
   const { mutate } = api.toDo.deleteToDoById.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setStatus(!status);
-      todoContext.getAllToDos.invalidate();
+
+      await todoContext.getAllToDos.invalidate();
     },
     onError: () => {
       console.log("Error");
@@ -22,15 +23,15 @@ function ToDoItem({ todoItem }: { todoItem: ToDo }) {
   });
 
   const { mutate: update } = api.toDo.toggleToDo.useMutation({
-    onSuccess: () => {
-      todoContext.getAllToDos.invalidate();
+    onSuccess: async () => {
+      await todoContext.getAllToDos.invalidate();
     },
     onError: () => {
       console.log("Error");
     },
   });
 
-  const taskDelete = async () => {
+  const taskDelete = () => {
     const { id } = todoItem;
     mutate(id);
   };

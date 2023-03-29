@@ -8,10 +8,11 @@ export default function ToDoInput() {
   const [text, setText] = useState("");
 
   const todoContext = api.useContext().toDo;
-  const { mutateAsync: createTodo } = api.toDo.addTodo.useMutation({
-    onSuccess: () => {
+  const { mutate: createTodo } = api.toDo.addTodo.useMutation({
+    onSuccess: async () => {
       setText("");
-      todoContext.getAllToDos.invalidate();
+      // tslint:disable-next-line:no-unsafe-any
+      await todoContext.getAllToDos.invalidate();
     },
     onError: () => {
       toast.error("Error...");
@@ -21,8 +22,9 @@ export default function ToDoInput() {
 
   const { mutate: deleteTodoCompleted } =
     api.toDo.deleteToDoCompleted.useMutation({
-      onSuccess: () => {
-        todoContext.getAllToDos.invalidate();
+      onSuccess: async () => {
+        // tslint:disable-next-line:no-unsafe-any
+        await todoContext.getAllToDos.invalidate();
       },
     });
 
@@ -30,7 +32,7 @@ export default function ToDoInput() {
     deleteTodoCompleted();
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     createTodo({ text });
