@@ -82,24 +82,4 @@ export const todoRouter = createTRPCRouter({
         },
       });
     }),
-  toggleAll: protectedProcedure
-    .input(
-      z.object({
-        isCompleted: z.boolean(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { isCompleted } = input;
-      const { session } = ctx;
-      const userId = session.user.id;
-      await ctx.prisma.toDo.updateMany({
-        where: {
-          userId,
-          isCompleted: false,
-        },
-        data: {
-          isCompleted,
-        },
-      });
-    }),
 });
