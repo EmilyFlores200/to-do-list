@@ -65,7 +65,10 @@ function ToDoItem({ todoItem }: { todoItem: ToDo }) {
             <div className="text-md text-purple-600 p-1">{todoItem?.text}</div>
           </>
         )}
-        <BsTrash className="m-2 w-6 h-6 text-violet-500" onClick={taskDelete} />
+        <BsTrash
+          className="m-2 w-6 h-6 text-violet-500 cursor-pointer"
+          onClick={taskDelete}
+        />
       </span>
     </>
   );

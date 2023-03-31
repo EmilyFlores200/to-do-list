@@ -11,7 +11,7 @@ export default function ToDoInput() {
   const { mutate: createTodo } = api.toDo.addTodo.useMutation({
     onSuccess: async () => {
       setText("");
-      // tslint:disable-next-line:no-unsafe-any
+
       await todoContext.getAllToDos.invalidate();
     },
     onError: () => {
@@ -23,7 +23,6 @@ export default function ToDoInput() {
   const { mutate: deleteTodoCompleted } =
     api.toDo.deleteToDoCompleted.useMutation({
       onSuccess: async () => {
-        // tslint:disable-next-line:no-unsafe-any
         await todoContext.getAllToDos.invalidate();
       },
     });
